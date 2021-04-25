@@ -389,7 +389,11 @@ async def updateCells(users, typeOfReact):
                 invalidCount = invalidCount + 1
                 print("updateCells: CellNotFound - " + str(user))                
                 await system_message_channel.send("Former Niglets " + str(user) + " has reacted to post and left the server, total reacts in server may not match sheet react count.")
-
+            except Exception as outliner:
+                invalidCount = invalidCount + 1
+                print("updateCells: outliner Exception - " + str(outliner))           
+                await system_message_channel.send(str(user) + " is an outlier and there is an issue with the nick or some other unknown error.")
+                
             i = i + 1
         
             if i % 5 == 0:
@@ -490,7 +494,10 @@ async def updateCells(users, typeOfReact):
                 invalidCount = invalidCount + 1
                 print("updateCells: CellNotFound - " + str(user))
                 await system_message_channel.send("Former Niglets " + str(user) + " has reacted to post and left the server, total reacts in server may not match sheet react count.")
-                        
+            except Exception as outliner:
+                invalidCount = invalidCount + 1
+                print("updateCells: outliner Exception - " + str(outliner))           
+                await system_message_channel.send(str(user) + " is an outlier and there is an issue with the nick or some other unknown error.")                    
 
             i = i + 1
             if i % 5 == 0:
@@ -547,7 +554,10 @@ async def updateCells(users, typeOfReact):
                 invalidCount = invalidCount + 1
                 print("updateCells: CellNotFound - " + str(user))
                 await system_message_channel.send("Former Niglets " + str(user) + " has reacted to post and left the server, total reacts in server may not match sheet react count.")
-                        
+            except Exception as outliner:
+                invalidCount = invalidCount + 1
+                print("updateCells: outliner Exception - " + str(outliner))           
+                await system_message_channel.send(str(user) + " is an outlier and there is an issue with the nick or some other unknown error.")
 
             i = i + 1
             if i % 5 == 0:
