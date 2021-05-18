@@ -671,7 +671,7 @@ async def on_raw_reaction_add(payload):
         current_gtw_emoji_allowed = data['currentGTWEmojiName']
 
         borutaSheetFlag = data['borutaSheetFlag']
-        GTWSheetFlag = data['GiltineSheetFlag']
+        GiltineSheetFlag = data['GiltineSheetFlag']
         GTWSheetFlag = data['GTWSheetFlag']
 
         if (payload.emoji.name == current_boruta_emoji_allowed) or (payload.emoji.name == current_gtw_emoji_allowed) or (payload.emoji.name == current_giltine_emoji_allowed):
