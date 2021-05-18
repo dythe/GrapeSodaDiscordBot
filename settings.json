@@ -1,0 +1,18 @@
+{
+    "discordToken": "",
+    "googleAPIKey": "",
+    "keyFileLocation": "grapesoda.json",
+    "currentBorutaEmojiName": "floshed",
+    "currentGiltineEmojiName": "floshed",
+    "currentGTWEmojiName": "floshed",
+    "serverID": "123456789",
+    "mainChannelID": "123456789",
+    "systemMsgChannelID": "123456789",
+    "borutaMessageID": "123456789",
+    "GTWMessageID": "123456789",
+    "giltineMessageID": "123456789",
+    "botOwnerID": "123456789",
+    "borutaSheetFlag": "0",
+    "GTWSheetFlag": "0",
+    "GiltineSheetFlag": "0"
+}
