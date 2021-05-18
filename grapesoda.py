@@ -172,17 +172,6 @@ async def emoji(ctx, arg1, arg2):
             await system_message_channel.send("Emoji detected for .giltine command is set to " + str(arg2))
 
 @bot.command(pass_context=True)
-async def test3(ctx):
-    # current date and time
-    # now = datetime.now()
-    # timestamp = datetime.timestamp(now)
-    # dt_object = datetime.fromtimestamp(timestamp)
-    # print("timestamp =", timestamp)
-    # print("dt_object =", dt_object)
-
-    worksheet = sht1.add_worksheet(title="Temporary Boruta React" % dt_object, rows="100", cols="20")
-
-@bot.command(pass_context=True)
 async def test(ctx):
     # info = formula_spreadsheet_information()
     # print (len(info))
@@ -343,11 +332,19 @@ async def msgid(ctx, *args):
             await system_message_channel.send(embed=statusEmbed)
         else:
             await system_message_channel.send("Invalid arguments")
-        
+
 async def updateCells(users, typeOfReact):
 
+    server_on_ready = bot.get_guild(id=int(server_id))
+    niglets_role = discord.utils.get(server_on_ready.roles,name="Niglets")
     system_message_channel = bot.get_channel(int(system_message_channel_id))
+    main_channel = bot.get_channel(int(main_channel_id))
 
+    # Hide Nighlets role from viewing channel
+    perms = main_channel.overwrites_for(niglets_role)
+    perms.view_channel = False
+    await main_channel.set_permissions(niglets_role, overwrite=perms)
+    
     if typeOfReact == 'boruta':
         reactBorutaSheet.clear()
 
@@ -365,7 +362,6 @@ async def updateCells(users, typeOfReact):
         invalidCount = 0
 
         for user in users:
-
             try:
                 cell = discordID.find(str(user.id))
                 actualIGN = discordID.cell(cell.row, 5).value
@@ -408,49 +404,6 @@ async def updateCells(users, typeOfReact):
         reactBorutaSheet.update_cells(cell_listD)
         reactBorutaSheet.update_cells(cell_listE)
 
-        #psuedo code
-        # detect if json flag is 1 if it is processing from sheet of add/remove users
-        # logic in raw_reaction_add/remove is halfway done
-        # raw_reaction_add - not done
-        # raw_reaction_remove - done halfwya but need to check whether the remove/add exist otherwise just update
-
-        # data = readJSON()
-        # boruta_message_id = data['borutaMessageID']        
-        # message = await main_channel.fetch_message(boruta_message_id)
-        # await system_message_channel.send("Doing final check if anyone add/remove reaction during processing...")
-        
-        # usersLatest = set()
-        # for reaction in message.reactions:
-        #     async for user in reaction.users():
-        #         usersLatest.add(user)
-
-        # lengthOfUsers = len(users)
-        # lengthOfLatestUsers = len (usersLatest)
-
-        # print("set users size %s" % lengthOfUsers)
-        # print("set usersLatest size %s" % lengthOfLatestUsers)
-
-        # diffSet = None
-
-        # await system_message_channel.send("Doing final check of boruta list...")
-        # Same length, don't do anything
-        # if (lengthOfUsers == lengthOfLatestUsers):
-        #     await system_message_channel.send("Length of before and after set is the same, processing...")
-        #     print("Length of before and after set is the same, processing...")
-        # elif (lengthOfUsers > lengthOfLatestUsers):
-        #     await system_message_channel.send("Length of before is larger than after, reprocessing...")
-        #     print("Length of before is larger than after, reprocessing...")
-        #     diffSet = usersLatest - users
-        # elif (lengthOfUsers < lengthOfLatestUsers):
-        #     await system_message_channel.send("Length of after is larger than before, reprocessing...")
-        #     print("Length of after is larger than before, reprocessing...")
-        #     diffSet = users - usersLatest
-
-        # for val in diffSet:
-        #     cell = discordID.find(str(val))
-        #     values_in_row = discordID.row_values(cell.row)
-        #     print(values_in_row)
-        
         await system_message_channel.send("Processing Boruta react list completed. %s out of %s reacts are valid." % (str(originalUsersCount - invalidCount), str(originalUsersCount)))        
         print("Processing Boruta react list completed.")
     elif typeOfReact == 'giltine':
@@ -511,6 +464,7 @@ async def updateCells(users, typeOfReact):
         reactGiltineSheet.update_cells(cell_listC)
         reactGiltineSheet.update_cells(cell_listD)    
         reactGiltineSheet.update_cells(cell_listE)         
+    
         await system_message_channel.send("Processing Giltine react list completed. %s out of %s reacts are valid." % (str(originalUsersCount - invalidCount), str(originalUsersCount)))
         print("Processing Giltine react list completed.")
     elif typeOfReact == 'gtw':
@@ -570,10 +524,14 @@ async def updateCells(users, typeOfReact):
         reactGTWSheet.update_cells(cell_listB)
         reactGTWSheet.update_cells(cell_listC)
         reactGTWSheet.update_cells(cell_listD)    
-        reactGTWSheet.update_cells(cell_listE)         
+        reactGTWSheet.update_cells(cell_listE)
+
         await system_message_channel.send("Processing GTW react list completed. %s out of %s reacts are valid." % (str(originalUsersCount - invalidCount), str(originalUsersCount)))
         print("Processing GTW react list completed.")
-        
+    
+    perms.view_channel = True
+    await main_channel.set_permissions(niglets_role, overwrite=perms)
+
 @bot.command(pass_context=True)
 async def boruta(ctx):
     if checkRoles(ctx, allowedRoles2) == 1: 
@@ -1164,7 +1122,8 @@ async def refresh(ctx):
                         tempNickname = str(member.name)
                     else:
                         tempNickname = str(member.nick)                   
-                    retrieve_non_niglets_value = discord_id_dict.get(str(member.id))                   
+                    retrieve_non_niglets_value = discord_id_dict.get(str(member.id))          
+                             
                     if retrieve_non_niglets_value != None: # If not None means it exist therefore attempt to delete it
                         # have to call api again as delete_row may shift row position
                         try:
