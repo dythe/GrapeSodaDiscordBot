@@ -149,7 +149,6 @@ async def commands(ctx):
         statusEmbed.add_field(name='.msgid status', value='Show the message IDs of Boruta, Giltine and GTW', inline=True)
         statusEmbed.add_field(name='.msgid (boruta/giltine/gtw) (id)', value='Update the messageID so that the bot can recognise the react from the specified id', inline=True)
         statusEmbed.add_field(name='.emoji (boruta/giltine/gtw) (emoji name)', value='Change the emoji detected for .boruta / .giltine / .gtw command', inline=True)
-        # statusEmbed.add_field(name='.reacts', value='Show the total number of reacts for Boruta and GTW', inline=False)
         await system_message_channel.send(embed=statusEmbed)
 
 @bot.command(pass_context=True)
@@ -204,21 +203,6 @@ async def test(ctx):
         print ("Giltine Discord length %s" % giltine_message_id.reactions[0].count)
     except AttributeError: # NoneType
         print("giltine_message_id Add Reaction: NoneType")
-
-    # if checkRoles(ctx, allowedRoles2) == 1:    
-    #     system_message_channel = bot.get_channel(int(system_message_channel_id))
-
-    #     cell_list = reactBorutaSheet.range('A2:A150')
-
-    #     data = dict()
-
-    #     for i, cell in enumerate(cell_list):
-    #         if cell.value != "":
-    #             print(str(i+2) + " " + cell.value)
-    #         else:
-    #             break
-
-    #     await system_message_channel.send("Test done.")
 
 @bot.command(pass_context=True)
 async def msgid(ctx, *args):
@@ -340,7 +324,7 @@ async def updateCells(users, typeOfReact):
     system_message_channel = bot.get_channel(int(system_message_channel_id))
     main_channel = bot.get_channel(int(main_channel_id))
 
-    # Hide Nighlets role from viewing channel
+    # Hide Nighlets role from viewing channel when processing list
     perms = main_channel.overwrites_for(niglets_role)
     perms.view_channel = False
     await main_channel.set_permissions(niglets_role, overwrite=perms)
@@ -633,16 +617,6 @@ async def on_raw_reaction_add(payload):
         GTWSheetFlag = data['GTWSheetFlag']
 
         if (payload.emoji.name == current_boruta_emoji_allowed) or (payload.emoji.name == current_gtw_emoji_allowed) or (payload.emoji.name == current_giltine_emoji_allowed):
-            print("add raw reaction: correct emoji: %s", payload.emoji.name)
-            
-            print("boruta msg id : " + str(boruta_message_id))
-            print("giltine msg id : " + str(giltine_message_id))
-            print("gtw msg id : " + str(gtw_message_id))
-            print("payload msg id : " + str(payload.message_id))
-
-            # print(len(str(boruta_message_id)))
-            # print(len(str(payload.message_id)))
-
             if (str(payload.message_id) == str(boruta_message_id)) and (payload.emoji.name == current_boruta_emoji_allowed):
                 print ("boruta and payload msg id matches")
                 print("Boruta users length: " + str(message.reactions[0].count))
@@ -752,7 +726,6 @@ async def on_raw_reaction_add(payload):
                     except gspread.exceptions.CellNotFound:
                         # print("Add Reaction Check Spam: CellNotFound")
                         await system_message_channel.send(embed=reactionAddEmbed)
-                        # await system_message_channel.send("GTW react list updated. Type .reacts to get latest count.")
                         reactGiltineSheet.append_row([str(payload.user_id), str(payload.member), str(changedDiscordNickname), str(actualDiscordNickname), str(actualIGN)])
 
                 except gspread.exceptions.CellNotFound:  # or except gspread.CellNotFound:
@@ -762,11 +735,8 @@ async def on_raw_reaction_add(payload):
                 
                 try:
                     cells = reactGiltineSheet.findall(str(payload.user_id))
-                    # print(cells)
-                    # print("size of cells is: " + str(len(cells)))
 
                     if len(cells) > 1:
-                        # print("cells more than 1")
                         counter = 0
                         for cellValue in cells:
                             if counter != 0:
@@ -823,7 +793,6 @@ async def on_raw_reaction_add(payload):
                     except gspread.exceptions.CellNotFound:
                         # print("Add Reaction Check Spam: CellNotFound")
                         await system_message_channel.send(embed=reactionAddEmbed)
-                        # await system_message_channel.send("GTW react list updated. Type .reacts to get latest count.")
                         reactGTWSheet.append_row([str(payload.user_id), str(payload.member), str(changedDiscordNickname), str(actualDiscordNickname), str(actualIGN)])
 
                 except gspread.exceptions.CellNotFound:  # or except gspread.CellNotFound:
@@ -833,11 +802,8 @@ async def on_raw_reaction_add(payload):
                 
                 try:
                     cells = reactGTWSheet.findall(str(payload.user_id))
-                    # print(cells)
-                    # print("size of cells is: " + str(len(cells)))
 
                     if len(cells) > 1:
-                        # print("cells more than 1")
                         counter = 0
                         for cellValue in cells:
                             if counter != 0:
@@ -863,10 +829,6 @@ async def on_raw_reaction_remove(payload):
     changedDiscordNickname = "Not known yet"
     actualDiscordNickname = "Not known yet"
     actualIGN = "Not known yet"
-
-    # print("remove reaction payload msg id : " + str(payload.message_id))
-    # print("remove reaction payload channel id : " + str(payload.channel_id))
-    # print("remove reaction channel id : " + str(channel_id))
     data = readJSON()
 
     borutaSheetFlag = data['borutaSheetFlag']
@@ -886,12 +848,6 @@ async def on_raw_reaction_remove(payload):
         system_message_channel = bot.get_channel(int(system_message_channel_id))
         message = await main_channel.fetch_message(payload.message_id)
         if (payload.emoji.name == current_boruta_emoji_allowed) or (payload.emoji.name == current_gtw_emoji_allowed) or (payload.emoji.name == current_giltine_emoji_allowed):
-            # print("remove raw reaction: correct emoji")
-            
-            # data = readJSON()
-            # boruta_message_id = data['borutaMessageID']
-            # gtw_message_id = data['GTWMessageID']
-
             if (str(payload.message_id) == str(boruta_message_id)) and (payload.emoji.name == current_boruta_emoji_allowed):
 
                 discord_id_dict = formula_spreadsheet_information()        
@@ -930,13 +886,9 @@ async def on_raw_reaction_remove(payload):
                 # reactionRemoveEmbed.add_field(name='Emoji Name', value=str(payload.emoji.name), inline=False)
 
                 try:
-                    # if (int(borutaSheetFlag) == 0):
                     cell = reactBorutaSheet.find(str(payload.user_id))
                     reactBorutaSheet.delete_row(cell.row)
                     await system_message_channel.send(embed=reactionRemoveEmbed)
-                    # else:
-                    #     print("Reaction remove on %s - %s - %s during processing boruta list, adding to temporary sheet" % str(member.id), str(member), tempNickname)
-                    #     tempReactBorutaSheet.append_row([str(member.id), "remove"])
 
                 except gspread.exceptions.CellNotFound:  # or except gspread.CellNotFound:
                     print("Add Reaction: CellNotFound")
@@ -948,7 +900,6 @@ async def on_raw_reaction_remove(payload):
                 print("Discord Username: " + str(discordUsername))
                 print("Changed Discord Nickname: " + str(changedDiscordNickname))
                 print("Actual Discord Nickname: " + str(actualDiscordNickname))
-                # await system_message_channel.send("Boruta react list updated. Type .reacts to get latest count.")
             elif (str(payload.message_id) == str(giltine_message_id)) and (payload.emoji.name == current_giltine_emoji_allowed):            
                 discord_id_dict = formula_spreadsheet_information()       	
                 try:
@@ -985,14 +936,10 @@ async def on_raw_reaction_remove(payload):
                 # reactionRemoveEmbed.add_field(name='Actual Discord Nickname', value=str(actualDiscordNickname), inline=False)
                 # reactionRemoveEmbed.add_field(name='Emoji Name', value=str(payload.emoji.name), inline=False)
 
-                try:            
-                    # if (int(GiltineSheetFlag) == 0):
+                try:
                     cell = reactGiltineSheet.find(str(payload.user_id))
                     reactGiltineSheet.delete_row(cell.row)
                     await system_message_channel.send(embed=reactionRemoveEmbed)
-                    # else:
-                    #     print("Reaction remove on %s - %s - %s during processing giltine list, adding to temporary sheet" % str(member.id), str(member), tempNickname)
-                    #     tempReactGiltineSheet.append_row([str(member.id), "remove"])
                         
                 except gspread.exceptions.CellNotFound:  # or except gspread.CellNotFound:
                     print("Add Reaction: CellNotFound")
@@ -1004,7 +951,6 @@ async def on_raw_reaction_remove(payload):
                 print("Discord Username: " + str(discordUsername))
                 print("Changed Discord Nickname: " + str(changedDiscordNickname))
                 print("Actual Discord Nickname: " + str(actualDiscordNickname))                
-                # await system_message_channel.send("Giltine react list updated. Type .reacts to get latest count.")
             elif (str(payload.message_id) == str(gtw_message_id)) and (payload.emoji.name == current_gtw_emoji_allowed):            
                 discord_id_dict = formula_spreadsheet_information()       	
                 try:
@@ -1041,14 +987,10 @@ async def on_raw_reaction_remove(payload):
                 # reactionRemoveEmbed.add_field(name='Actual Discord Nickname', value=str(actualDiscordNickname), inline=False)
                 # reactionRemoveEmbed.add_field(name='Emoji Name', value=str(payload.emoji.name), inline=False)
 
-                try:            
-                    # if (int(GTWSheetFlag) == 0):
+                try:
                     cell = reactGTWSheet.find(str(payload.user_id))
                     reactGTWSheet.delete_row(cell.row)
                     await system_message_channel.send(embed=reactionRemoveEmbed)
-                    # else:
-                    #     print("Reaction remove on %s - %s - %s during processing gtw list, adding to temporary sheet" % str(member.id), str(member), tempNickname)
-                    #     tempReactGTWSheet.append_row([str(member.id), "remove"])
                         
                 except gspread.exceptions.CellNotFound:  # or except gspread.CellNotFound:
                     print("Add Reaction: CellNotFound")
@@ -1060,7 +1002,6 @@ async def on_raw_reaction_remove(payload):
                 print("Discord Username: " + str(discordUsername))
                 print("Changed Discord Nickname: " + str(changedDiscordNickname))
                 print("Actual Discord Nickname: " + str(actualDiscordNickname))                
-                # await system_message_channel.send("GTW react list updated. Type .reacts to get latest count.")
 
 @bot.command(pass_context=True)
 async def refresh(ctx):
@@ -1082,7 +1023,7 @@ async def refresh(ctx):
             for member in server.members:
                 members_flag = 0
                 for roles in member.roles:
-                    retrieve_key_value = discord_id_dict.get(str(member.id)) #retrieve key value based on member id
+                    retrieve_key_value = discord_id_dict.get(str(member.id)) # retrieve key value based on member id
                     if str(roles) == 'Niglets':
                         serverListSet.add(str(member.id))
                         members_flag = 1
@@ -1096,7 +1037,6 @@ async def refresh(ctx):
                             discordID.append_row([str(member.id), str(member), tempNickname, str(member.name), "Not known yet"])
                             await system_message_channel.send("Niglets added: " + str(tempNickname) + " (" + str(member.id) + ")" + " - " + str(member))
                         else: # if existing member attempt to update
-
                             try:
                                 cell = discordID.find(str(member.id)) # have to call api again as delete_row may shift row position
                                 cell_row_number = cell.row                  
@@ -1106,7 +1046,6 @@ async def refresh(ctx):
                                 cell_values = [str(member.id), str(member), tempNickname, str(member.name), retrieve_key_value[4]]
 
                                 for m, val in enumerate(cell_values):
-                                    # print ("val " + str(m) + ": " + str(val))
                                     cell_range_to_update[m].value = val
 
                                 # print (cell_range_to_update)
@@ -1277,43 +1216,5 @@ def create_assertion_session(conf_file, scopes, subject=None):
 def divider():
     divider = "--------------------------------------------------------------------------------"
     print(divider)
-
-# @bot.command(pass_context=True)
-# async def roles(ctx):
-#     if checkRoles(ctx, allowedRoles1) == 1:    
-#         print ("Updating Roles...")
-#         server = bot.get_guild(id=server_id)
-
-#         cell_values = [0 for x in range(300)]
-#         cell_listA = discordID.range('A2:A150')
-#         cell_listB = discordID.range('B2:B150')
-#         cell_listC = discordID.range('C2:C150')
-#         cell_listD = discordID.range('D2:D150')
-
-#         i = 0
-#         if server:
-#             for member in server.members:
-#                 for roles in member.roles:
-#                     if str(roles) == 'Niglets':
-#                         # print('1: ' + str(member.id)) # 225613774382432257
-#                         # print('2: ' + member.name) # Konya
-#                         # print('3: ' + str(member)) # Konya#7922
-#                         cell_listA[i].value = str(member.id)
-
-#                         cell_listB[i].value = str(member)
-
-#                         cell_listD[i].value = str(member.name)
-
-#                         if (str(member.nick) == 'None'):
-#                             cell_listC[i].value = str(member.name)
-#                         else:
-#                             cell_listC[i].value = str(member.nick)
-
-#                         i = i + 1
-
-#         discordID.update_cells(cell_listA)
-#         discordID.update_cells(cell_listB)
-#         discordID.update_cells(cell_listC)
-#         discordID.update_cells(cell_listD)
 
 bot.run(discordToken)
