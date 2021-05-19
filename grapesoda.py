@@ -92,6 +92,16 @@ async def on_message(message):
     await bot.process_commands(message)
 
 @bot.command(pass_context=True)
+async def temp5(ctx):
+    guild = bot.get_guild(id=int(server_id))
+    if guild.get_member(123631705662685188) is not None:
+        # member is in server
+        print("in server")
+    else:
+        # memebr not in server
+        print("not in server")
+
+@bot.command(pass_context=True)
 async def restart(ctx):
     system_message_channel = bot.get_channel(int(system_message_channel_id))
     if str(ctx.author.id) == str(bot_owner_id):
@@ -346,41 +356,58 @@ async def updateCells(users, typeOfReact):
         invalidCount = 0
 
         for user in users:
-            try:
-                cell = discordID.find(str(user.id))
-                actualIGN = discordID.cell(cell.row, 5).value
+            # exitCondition to redo the current item in the case that the user is in server but react is not refreshed yet
+            exitCondition = 0
+            while exitCondition == 0:
+                tempNickname = None
+                try:
+                    print ("DEBUG: " + str(user))
 
-                cell_listA[i].value = str(user.id)
+                    if str(user.nick) == 'None':
+                        cell_listC[i].value = str(user.name)
+                        tempNickname = str(user.name)
+                    else:
+                        cell_listC[i].value = str(user.nick)
+                        tempNickname = str(user.nick)
 
-                cell_listB[i].value = str(user)
+                    cell = discordID.find(str(user.id))
+                    actualIGN = discordID.cell(cell.row, 5).value
+                    
+                    cell_listA[i].value = str(user.id)
+                    cell_listB[i].value = str(user)
+                    cell_listD[i].value = str(user.name)
+                    
+                    if len(actualIGN) == 0:
+                        cell_listE[i].value = "Not known yet"
+                    else:
+                        cell_listE[i].value = actualIGN
 
-                if str(user.nick) == 'None':
-                    cell_listC[i].value = str(user.name)
-                else:
-                    cell_listC[i].value = str(user.nick)
+                    # so we can exit the while loop if nothing goes wrong
+                    exitCondition = 1
+                except gspread.exceptions.CellNotFound:         
+                    if server_on_ready.get_member(int(user.id)) is not None:
+                        # member is in server
+                        print("in server: adding %s into list, and reprocessing this loop" % str(user.name))
+                        discordID.append_row([str(user.id), str(user), tempNickname, str(user.name), "Not known yet"])
+                        await system_message_channel.send("New Niglets %s has reacted to post but is not in Discord ID list, adding the new member to the list." % str(user))
+                    else:
+                        # member not in server
+                        print("not in server")
+                        invalidCount = invalidCount + 1
+                        print("updateCells: CellNotFound - " + str(user))
+                        await system_message_channel.send("Former Niglets %s has reacted to post and left the server, total reacts in server may not match sheet react count." % str())
+                except Exception as outliner:
+                    invalidCount = invalidCount + 1
+                    print("updateCells: outliner Exception - " + str(outliner))           
+                    await system_message_channel.send("%s is an outlier and there is an issue with the nick or some other unknown error." % str(user))                    
 
-                cell_listD[i].value = str(user.name)
-                
-                if len(actualIGN) == 0:
-                    cell_listE[i].value = "Not known yet"
-                else:
-                    cell_listE[i].value = actualIGN
-            except gspread.exceptions.CellNotFound:
-                invalidCount = invalidCount + 1
-                print("updateCells: CellNotFound - " + str(user))                
-                await system_message_channel.send("Former Niglets " + str(user) + " has reacted to post and left the server, total reacts in server may not match sheet react count.")
-            except Exception as outliner:
-                invalidCount = invalidCount + 1
-                print("updateCells: outliner Exception - " + str(outliner))           
-                await system_message_channel.send(str(user) + " is an outlier and there is an issue with the nick or some other unknown error.")
-                
-            i = i + 1
-        
-            if i % 5 == 0:
-                await system_message_channel.send("Processing Boruta react list: " + str(i) + " of " + str(len(users)))
+                if exitCondition != 0:
+                    i = i + 1
+                    if i % 5 == 0:
+                        await system_message_channel.send("Processing Boruta react list: " + str(i) + " of " + str(len(users)))
 
-            print("Processing Boruta react list: " + str(i) + " of " + str(len(users)))
-            await asyncio.sleep(2.5)
+                print("Processing Boruta react list: " + str(i) + " of " + str(len(users)))
+                await asyncio.sleep(2.5)
 
         reactBorutaSheet.update_cells(cell_listA)
         reactBorutaSheet.update_cells(cell_listB)
@@ -407,41 +434,58 @@ async def updateCells(users, typeOfReact):
         invalidCount = 0
 
         for user in users:
-            
-            try:
-                print ("DEBUG: " + str(user))
-                cell = discordID.find(str(user.id))
-                actualIGN = discordID.cell(cell.row, 5).value
-                
-                cell_listA[i].value = str(user.id)
-                cell_listB[i].value = str(user)
+            # exitCondition to redo the current item in the case that the user is in server but react is not refreshed yet
+            exitCondition = 0
+            while exitCondition == 0:
+                tempNickname = None
+                try:
+                    print ("DEBUG: " + str(user))
 
-                if str(user.nick) == 'None':
-                    cell_listC[i].value = str(user.name)
-                else:
-                    cell_listC[i].value = str(user.nick)
+                    if str(user.nick) == 'None':
+                        cell_listC[i].value = str(user.name)
+                        tempNickname = str(user.name)
+                    else:
+                        cell_listC[i].value = str(user.nick)
+                        tempNickname = str(user.nick)
 
-                cell_listD[i].value = str(user.name)
-                
-                if len(actualIGN) == 0:
-                    cell_listE[i].value = "Not known yet"
-                else:
-                    cell_listE[i].value = actualIGN
-            except gspread.exceptions.CellNotFound:
-                invalidCount = invalidCount + 1
-                print("updateCells: CellNotFound - " + str(user))
-                await system_message_channel.send("Former Niglets " + str(user) + " has reacted to post and left the server, total reacts in server may not match sheet react count.")
-            except Exception as outliner:
-                invalidCount = invalidCount + 1
-                print("updateCells: outliner Exception - " + str(outliner))           
-                await system_message_channel.send(str(user) + " is an outlier and there is an issue with the nick or some other unknown error.")                    
+                    cell = discordID.find(str(user.id))
+                    actualIGN = discordID.cell(cell.row, 5).value
+                    
+                    cell_listA[i].value = str(user.id)
+                    cell_listB[i].value = str(user)
+                    cell_listD[i].value = str(user.name)
+                    
+                    if len(actualIGN) == 0:
+                        cell_listE[i].value = "Not known yet"
+                    else:
+                        cell_listE[i].value = actualIGN
 
-            i = i + 1
-            if i % 5 == 0:
-                await system_message_channel.send("Processing Giltine react list: " + str(i) + " of " + str(len(users)))
+                    # so we can exit the while loop if nothing goes wrong
+                    exitCondition = 1
+                except gspread.exceptions.CellNotFound:         
+                    if server_on_ready.get_member(int(user.id)) is not None:
+                        # member is in server
+                        print("in server: adding %s into list, and reprocessing this loop" % str(user.name))
+                        discordID.append_row([str(user.id), str(user), tempNickname, str(user.name), "Not known yet"])
+                        await system_message_channel.send("New Niglets %s has reacted to post but is not in Discord ID list, adding the new member to the list." % str(user))
+                    else:
+                        # member not in server
+                        print("not in server")
+                        invalidCount = invalidCount + 1
+                        print("updateCells: CellNotFound - " + str(user))
+                        await system_message_channel.send("Former Niglets %s has reacted to post and left the server, total reacts in server may not match sheet react count." % str())
+                except Exception as outliner:
+                    invalidCount = invalidCount + 1
+                    print("updateCells: outliner Exception - " + str(outliner))           
+                    await system_message_channel.send("%s is an outlier and there is an issue with the nick or some other unknown error." % str(user))                    
 
-            print("Processing Giltine react list: " + str(i) + " of " + str(len(users)))
-            await asyncio.sleep(2.5)
+                if exitCondition != 0:
+                    i = i + 1
+                    if i % 5 == 0:
+                        await system_message_channel.send("Processing Giltine react list: " + str(i) + " of " + str(len(users)))
+
+                print("Processing Giltine react list: " + str(i) + " of " + str(len(users)))
+                await asyncio.sleep(2.5)
 
         reactGiltineSheet.update_cells(cell_listA)
         reactGiltineSheet.update_cells(cell_listB)
@@ -468,41 +512,57 @@ async def updateCells(users, typeOfReact):
         invalidCount = 0
 
         for user in users:
-            
-            try:
-                print ("DEBUG: " + str(user))
-                cell = discordID.find(str(user.id))
-                actualIGN = discordID.cell(cell.row, 5).value
-                
-                cell_listA[i].value = str(user.id)
-                cell_listB[i].value = str(user)
+            # exitCondition to redo the current item in the case that the user is in server but react is not refreshed yet
+            exitCondition = 0
+            while exitCondition == 0:
+                tempNickname = None
+                try:
+                    print ("DEBUG: " + str(user))
+                    if str(user.nick) == 'None':
+                        cell_listC[i].value = str(user.name)
+                        tempNickname = str(user.name)
+                    else:
+                        cell_listC[i].value = str(user.nick)
+                        tempNickname = str(user.nick)
 
-                if str(user.nick) == 'None':
-                    cell_listC[i].value = str(user.name)
-                else:
-                    cell_listC[i].value = str(user.nick)
+                    cell = discordID.find(str(user.id))
+                    actualIGN = discordID.cell(cell.row, 5).value
+                    
+                    cell_listA[i].value = str(user.id)
+                    cell_listB[i].value = str(user)
+                    cell_listD[i].value = str(user.name)
+                    
+                    if len(actualIGN) == 0:
+                        cell_listE[i].value = "Not known yet"
+                    else:
+                        cell_listE[i].value = actualIGN
 
-                cell_listD[i].value = str(user.name)
-                
-                if len(actualIGN) == 0:
-                    cell_listE[i].value = "Not known yet"
-                else:
-                    cell_listE[i].value = actualIGN
-            except gspread.exceptions.CellNotFound:
-                invalidCount = invalidCount + 1
-                print("updateCells: CellNotFound - " + str(user))
-                await system_message_channel.send("Former Niglets " + str(user) + " has reacted to post and left the server, total reacts in server may not match sheet react count.")
-            except Exception as outliner:
-                invalidCount = invalidCount + 1
-                print("updateCells: outliner Exception - " + str(outliner))           
-                await system_message_channel.send(str(user) + " is an outlier and there is an issue with the nick or some other unknown error.")
+                    # so we can exit the while loop if nothing goes wrong
+                    exitCondition = 1
+                except gspread.exceptions.CellNotFound:         
+                    if server_on_ready.get_member(int(user.id)) is not None:
+                        # member is in server
+                        print("in server: adding %s into list, and reprocessing this loop" % str(user.name))
+                        discordID.append_row([str(user.id), str(user), tempNickname, str(user.name), "Not known yet"])
+                        await system_message_channel.send("New Niglets %s has reacted to post but is not in Discord ID list, adding the new member to the list." % str(user))
+                    else:
+                        # member not in server
+                        print("not in server")
+                        invalidCount = invalidCount + 1
+                        print("updateCells: CellNotFound - " + str(user))
+                        await system_message_channel.send("Former Niglets %s has reacted to post and left the server, total reacts in server may not match sheet react count." % str())
+                except Exception as outliner:
+                    invalidCount = invalidCount + 1
+                    print("updateCells: outliner Exception - " + str(outliner))           
+                    await system_message_channel.send("%s is an outlier and there is an issue with the nick or some other unknown error." % str(user))                    
 
-            i = i + 1
-            if i % 5 == 0:
-                await system_message_channel.send("Processing GTW react list: " + str(i) + " of " + str(len(users)))
+                if exitCondition != 0:
+                    i = i + 1
+                    if i % 5 == 0:
+                        await system_message_channel.send("Processing GTW react list: " + str(i) + " of " + str(len(users)))
 
-            print("Processing GTW react list: " + str(i) + " of " + str(len(users)))
-            await asyncio.sleep(2.5)
+                print("Processing GTW react list: " + str(i) + " of " + str(len(users)))
+                await asyncio.sleep(2.5)
 
         reactGTWSheet.update_cells(cell_listA)
         reactGTWSheet.update_cells(cell_listB)
