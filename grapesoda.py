@@ -355,8 +355,8 @@ async def updateCells(users, typeOfReact):
                 except Exception as outliner:
                     invalidCount = invalidCount + 1
                     print("updateCells: outliner Exception - %s" % str(outliner))           
-                    await system_message_channel.send("%s is an outlier and there is an issue with the nick or some other unknown error." % str(user))                         
-
+                    await system_message_channel.send("%s is an outlier and there is an issue with the nick or some other unknown error/could also be due to leaving the server." % str(user))                         
+                    exitCondition = 1
                 if exitCondition != 0:
                     i = i + 1
                     if i % 5 == 0:
@@ -433,8 +433,8 @@ async def updateCells(users, typeOfReact):
                 except Exception as outliner:
                     invalidCount = invalidCount + 1
                     print("updateCells: outliner Exception - %s" % str(outliner))           
-                    await system_message_channel.send("%s is an outlier and there is an issue with the nick or some other unknown error." % str(user))                    
-
+                    await system_message_channel.send("%s is an outlier and there is an issue with the nick or some other unknown error/could also be due to leaving the server." % str(user))                         
+                    exitCondition = 1
                 if exitCondition != 0:
                     i = i + 1
                     if i % 5 == 0:
@@ -510,8 +510,8 @@ async def updateCells(users, typeOfReact):
                 except Exception as outliner:
                     invalidCount = invalidCount + 1
                     print("updateCells: outliner Exception - %s" % str(outliner))           
-                    await system_message_channel.send("%s is an outlier and there is an issue with the nick or some other unknown error." % str(user))                         
-
+                    await system_message_channel.send("%s is an outlier and there is an issue with the nick or some other unknown error/could also be due to leaving the server." % str(user))                         
+                    exitCondition = 1
                 if exitCondition != 0:
                     i = i + 1
                     if i % 5 == 0:
