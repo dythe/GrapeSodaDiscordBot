@@ -351,7 +351,7 @@ async def updateCells(users, typeOfReact):
                         print("Member %s is not in the server" % str(user.name))
                         invalidCount = invalidCount + 1
                         print("updateCells: CellNotFound - %s" % str(user))
-                        await system_message_channel.send("Former Niglets %s has reacted to post and left the server, total reacts in server may not match sheet react count." % str())
+                        await system_message_channel.send("Former Niglets %s has reacted to post and left the server, total reacts in server may not match sheet react count." % str(user))
                 except Exception as outliner:
                     invalidCount = invalidCount + 1
                     print("updateCells: outliner Exception - %s" % str(outliner))           
@@ -429,7 +429,7 @@ async def updateCells(users, typeOfReact):
                         print("Member %s is not in the server" % str(user.name))
                         invalidCount = invalidCount + 1
                         print("updateCells: CellNotFound - %s" % str(user))
-                        await system_message_channel.send("Former Niglets %s has reacted to post and left the server, total reacts in server may not match sheet react count." % str())
+                        await system_message_channel.send("Former Niglets %s has reacted to post and left the server, total reacts in server may not match sheet react count." % str(user))
                 except Exception as outliner:
                     invalidCount = invalidCount + 1
                     print("updateCells: outliner Exception - %s" % str(outliner))           
@@ -506,7 +506,7 @@ async def updateCells(users, typeOfReact):
                         print("Member %s is not in the server" % str(user.name))
                         invalidCount = invalidCount + 1
                         print("updateCells: CellNotFound - %s" % str(user))
-                        await system_message_channel.send("Former Niglets %s has reacted to post and left the server, total reacts in server may not match sheet react count." % str())
+                        await system_message_channel.send("Former Niglets %s has reacted to post and left the server, total reacts in server may not match sheet react count." % str(user))
                 except Exception as outliner:
                     invalidCount = invalidCount + 1
                     print("updateCells: outliner Exception - %s" % str(outliner))           
